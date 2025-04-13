@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./FarmerList.css";
 //using typescipt define your object
 type Farmer = {
   _id: string;
@@ -12,40 +13,55 @@ type Farmer = {
 function FarmerList() {
   //asusual we have the usestate
   const [farmers, setFarmers] = useState<Farmer[]>([]);
+  const [loading, setLoading] = useState(true);
   //we have the useeffect to get the data from db and store it in usestate
   useEffect(() => {
     axios
       .get<Farmer[]>("http://localhost:5000/farmers")
-      .then((res) => setFarmers(res.data))
-      .catch((err) => console.log(err));
+      .then((res) => {
+        setFarmers(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
   }, []);
+
+  if (loading) {
+    return <div className="loading">Loading farmer profiles...</div>;
+  }
+
   //we map the usestate and then we display it
   return (
-    <div>
-      <h2>Farmer Profiles</h2>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+    <div className="farmer-list-container">
+      <h2 className="farmer-list-header">Farmer Profiles</h2>
+      <div className="farmer-grid">
         {farmers.map((farmer /**any name */) => (
-          <div
-            key={farmer._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              borderRadius: "8px",
-              width: "200px",
-            }}
-          >
-            <img
-              src={farmer.img}
-              alt={`${farmer.name} image`} //noteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-              style={{ width: "100%", height: "150px", objectFit: "cover" }}
-            />
-            <h3>{farmer.name}</h3>
-            <p>
-              <strong>Location:</strong> {farmer.location}
-            </p>
-            <p>
-              <strong>District:</strong> {farmer.district}
-            </p>
+          <div key={farmer._id} className="farmer-card">
+            <div className="farmer-image-container">
+              <img
+                src={farmer.img}
+                alt={`${farmer.name}'s profile`}
+                className="farmer-image"
+              />
+            </div>
+            <div className="farmer-content">
+              <h3 className="farmer-name">{farmer.name}</h3>
+              <div className="farmer-details">
+                <div className="farmer-detail-item">
+                  <span className="farmer-detail-icon">📍</span>
+                  <span className="farmer-location">{farmer.location}</span>
+                </div>
+                <div className="farmer-detail-item">
+                  <span className="farmer-detail-icon">🏘️</span>
+                  <span className="farmer-district">{farmer.district}</span>
+                </div>
+              </div>
+              <a href={`/farmer/${farmer._id}`} className="farmer-view-button">
+                View Profile
+              </a>
+            </div>
           </div>
         ))}
       </div>
