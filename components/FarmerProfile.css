@@ -1,56 +1,259 @@
 .farmer-profile-container {
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f8f9fa;
 }
 
 .farmer-header {
   display: flex;
-  gap: 20px;
+  gap: 2rem;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 3rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.farmer-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(to right, #2c5530, #4CAF50);
 }
 
 .profile-img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.farm-slider-section {
-  margin-bottom: 30px;
-}
-
-.slider-placeholder {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-}
-
-.slider-placeholder img {
-  width: 300px;
+  width: 150px;
   height: 150px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 50%;
+  border: 4px solid #2c5530;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.profile-img:hover {
+  transform: scale(1.05);
+}
+
+.farmer-info {
+  flex: 1;
+}
+
+.farmer-info h2 {
+  font-size: 2.5rem;
+  color: #2c5530;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.farmer-info p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contribute-btn {
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, #2c5530, #4CAF50);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.contribute-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.farm-image-section {
+  margin-bottom: 3rem;
+}
+
+.farm-image-section h3 {
+  font-size: 1.8rem;
+  color: #2c5530;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.farm-image-wrapper {
+  width: 100%;
+  height: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.farm-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.farm-image:hover {
+  transform: scale(1.05);
 }
 
 .products-section {
-  margin-top: 20px;
+  margin-bottom: 3rem;
+}
+
+.products-section h3 {
+  font-size: 1.8rem;
+  color: #2c5530;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
 }
 
 .product-grid {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
 }
 
 .product-card {
-  width: 150px;
-  text-align: center;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 .product-card img {
   width: 100%;
-  height: 100px;
+  height: 200px;
   object-fit: cover;
-  border-radius: 10px;
+}
+
+.product-card h4 {
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #2c5530;
+  margin: 0;
+}
+
+.product-card p {
+  padding: 0 1rem 1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.collections-section {
+  margin-bottom: 3rem;
+}
+
+.collections-section h3 {
+  font-size: 1.8rem;
+  color: #2c5530;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.collection-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.collection-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.collection-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.collection-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.collection-content {
+  padding: 1.5rem;
+}
+
+.collection-content h4 {
+  font-size: 1.3rem;
+  color: #2c5530;
+  margin-bottom: 0.5rem;
+}
+
+.collection-content p {
+  color: #666;
+  line-height: 1.5;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #666;
+  padding: 3rem;
+}
+
+.error {
+  text-align: center;
+  color: #dc3545;
+  padding: 2rem;
+  font-size: 1.2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .farmer-profile-container {
+    padding: 1rem;
+  }
+
+  .farmer-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .profile-img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .farmer-info h2 {
+    font-size: 2rem;
+  }
+
+  .farm-image-wrapper {
+    height: 300px;
+  }
+
+  .product-grid,
+  .collection-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
 }

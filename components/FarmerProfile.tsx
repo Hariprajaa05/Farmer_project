@@ -3,95 +3,219 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./FarmerProfile.css";
 
-type Farmer = {
+interface Farmer {
   _id: string;
   name: string;
   location: string;
   district: string;
   img: string;
-  products: string[]; // Array of product_id (ObjectId as string)
-};
+  products: string[];
+  description?: string;
+  experience?: number;
+  certifications?: string[];
+}
 
-type FarmerProduct = {
+interface FarmerProduct {
   _id: string;
   farmer_id: string;
   product_id: string;
   price: number;
   image: string;
-};
+  stock?: number;
+  product_details?: {
+    name: string;
+    category: string;
+    description?: string;
+  };
+}
+
+interface Collection {
+  _id: string;
+  farmer_id: string;
+  name: string;
+  description: string;
+  image: string;
+  products?: string[];
+}
 
 function FarmerProfile() {
-  const { id } = useParams(); // Grab the farmer ID from the URL
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [farmer, setFarmer] = useState<Farmer | null>(null);
   const [farmerProducts, setFarmerProducts] = useState<FarmerProduct[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setError("No farmer ID provided");
+      setLoading(false);
+      return;
+    }
 
-    // Fetch the farmer details
-    const fetchFarmer = async () => {
+    const fetchData = async () => {
       try {
-        const farmerRes = await axios.get<Farmer>(
-          `http://localhost:5000/farmers/${id}`
-        );
+        setLoading(true);
+        const [farmerRes, productsRes] = await Promise.all([
+          axios.get<Farmer>(`http://localhost:5000/farmers/${id}`),
+          axios.get<FarmerProduct[]>(
+            `http://localhost:5000/farmer_products?farmer_id=${id}`
+          ),
+        ]);
+
         setFarmer(farmerRes.data);
-
-        // Fetch farmer_products based on farmer_id
-        const productRes = await axios.get<FarmerProduct[]>(
-          `http://localhost:5000/farmer_products?farmer_id=${id}`
-        );
-        setFarmerProducts(productRes.data);
-
-        setLoading(false);
+        setFarmerProducts(productsRes.data);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching data:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load farmer data"
+        );
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchFarmer();
+    fetchData();
   }, [id]);
 
-  if (loading) return <div>Loading Farmer Profile...</div>;
-  if (!farmer) return <div>Farmer not found!</div>;
+  const categories = [
+    "All",
+    ...new Set(
+      farmerProducts.map((p) => p.product_details?.category).filter(Boolean)
+    ),
+  ];
+
+  const filteredProducts =
+    selectedCategory === "All"
+      ? farmerProducts
+      : farmerProducts.filter(
+          (p) => p.product_details?.category === selectedCategory
+        );
+
+  if (loading) return <div className="loading">Loading Farmer Profile...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!farmer) return <div className="error">Farmer not found!</div>;
 
   return (
     <div className="farmer-profile-container">
       <div className="farmer-header">
-        <img src={farmer.img} alt={farmer.name} className="profile-img" />
-        <div>
+        <img
+          src={farmer.img || "/placeholder-avatar.png"}
+          alt={farmer.name}
+          className="profile-img"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/placeholder-avatar.png";
+          }}
+        />
+        <div className="farmer-info">
           <h2>{farmer.name}</h2>
           <p>📍 {farmer.location}</p>
           <p>🏘️ {farmer.district}</p>
+          {farmer.experience && (
+            <p>🌱 {farmer.experience} years of farming experience</p>
+          )}
+          {farmer.description && (
+            <p className="farmer-description">{farmer.description}</p>
+          )}
+          {farmer.certifications && farmer.certifications.length > 0 && (
+            <div className="certifications">
+              <p>🏆 Certifications:</p>
+              <div className="certification-tags">
+                {farmer.certifications.map((cert, index) => (
+                  <span key={index} className="certification-tag">
+                    {cert}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <button onClick={() => navigate(`/contribute/${farmer._id}`)}>
+        <button
+          className="contribute-btn"
+          onClick={() => navigate(`/contribute/${farmer._id}`)}
+        >
           Contribute
         </button>
       </div>
 
-      <div className="farm-slider-section">
-        <h3>Farm Images (Coming Soon)</h3>
-        <div className="slider-placeholder">
-          <img src="https://via.placeholder.com/300x150" alt="Farm" />
-          <img src="https://via.placeholder.com/300x150" alt="Farm" />
-          <img src="https://via.placeholder.com/300x150" alt="Farm" />
+      <div className="farm-image-section">
+        <h3>Farm Overview</h3>
+        <div className="farm-image-wrapper">
+          <img src="/placeholder-farm.jpg" alt="Farm" className="farm-image" />
         </div>
       </div>
 
       <div className="products-section">
-        <h3>Products in Market</h3>
-        <div className="product-grid">
-          {farmerProducts.map((prod) => (
-            <div key={prod._id} className="product-card">
-              <img src={prod.image} alt="Product" />
-              <p>₹{prod.price} / kg</p>
-            </div>
+        <h3>Products</h3>
+        <div className="category-filter">
+          {categories.map((category) => (
+            <button
+              key={category}
+              className={`category-btn ${
+                selectedCategory === category ? "active" : ""
+              }`}
+              onClick={() => category && setSelectedCategory(category)}
+            >
+              {category}
+            </button>
           ))}
         </div>
+        {filteredProducts.length === 0 ? (
+          <p className="no-products">No products available in this category</p>
+        ) : (
+          <div className="product-grid">
+            {filteredProducts.map((prod) => (
+              <div key={prod._id} className="product-card">
+                <img
+                  src={prod.image || "/placeholder-product.png"}
+                  alt={prod.product_details?.name || "Product"}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      "/placeholder-product.png";
+                  }}
+                />
+                <h4>{prod.product_details?.name || "Unknown Product"}</h4>
+                <p className="product-price">₹{prod.price.toFixed(2)} / kg</p>
+                {prod.stock !== undefined && (
+                  <p className="stock-info">Stock: {prod.stock} kg</p>
+                )}
+                {prod.product_details?.description && (
+                  <p className="product-description">
+                    {prod.product_details.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {collections.length > 0 && (
+        <div className="collections-section">
+          <h3>Collections</h3>
+          <div className="collection-list">
+            {collections.map((collection) => (
+              <div key={collection._id} className="collection-card">
+                <img
+                  src={collection.image || "/placeholder-collection.png"}
+                  alt={collection.name}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      "/placeholder-collection.png";
+                  }}
+                />
+                <div className="collection-content">
+                  <h4>{collection.name}</h4>
+                  <p>{collection.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
