@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import "./FarmerList.css";
 //using typescipt define your object
 type Farmer = {
@@ -39,29 +40,28 @@ function FarmerList() {
       <div className="farmer-grid">
         {farmers.map((farmer /**any name */) => (
           <div key={farmer._id} className="farmer-card">
-            <div className="farmer-image-container">
-              <img
-                src={farmer.img}
-                alt={`${farmer.name}'s profile`}
-                className="farmer-image"
-              />
-            </div>
-            <div className="farmer-content">
-              <h3 className="farmer-name">{farmer.name}</h3>
-              <div className="farmer-details">
-                <div className="farmer-detail-item">
-                  <span className="farmer-detail-icon">📍</span>
-                  <span className="farmer-location">{farmer.location}</span>
-                </div>
-                <div className="farmer-detail-item">
-                  <span className="farmer-detail-icon">🏘️</span>
-                  <span className="farmer-district">{farmer.district}</span>
+            <Link to={`/farmer/${farmer._id}`}>
+              <div className="farmer-image-container">
+                <img
+                  src={farmer.img}
+                  alt={`${farmer.name}'s profile`}
+                  className="farmer-image"
+                />
+              </div>
+              <div className="farmer-content">
+                <h3 className="farmer-name">{farmer.name}</h3>
+                <div className="farmer-details">
+                  <div className="farmer-detail-item">
+                    <span className="farmer-detail-icon">📍</span>
+                    <span className="farmer-location">{farmer.location}</span>
+                  </div>
+                  <div className="farmer-detail-item">
+                    <span className="farmer-detail-icon">🏘️</span>
+                    <span className="farmer-district">{farmer.district}</span>
+                  </div>
                 </div>
               </div>
-              <a href={`/farmer/${farmer._id}`} className="farmer-view-button">
-                View Profile
-              </a>
-            </div>
+            </Link>
           </div>
         ))}
       </div>

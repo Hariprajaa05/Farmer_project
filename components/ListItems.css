@@ -51,8 +51,8 @@
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
 }
 
 .product-card {
@@ -63,6 +63,9 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-width: 250px;
+  max-width: 350px;
+  margin: 0 auto;
 }
 
 .product-card:hover {
@@ -73,7 +76,7 @@
 .product-image-container {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 180px;
   overflow: hidden;
 }
 
@@ -101,7 +104,7 @@
 }
 
 .product-content {
-  padding: 1.5rem;
+  padding: 1.25rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -124,7 +127,7 @@
 .farmer-info {
   display: flex;
   align-items: center;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
   margin-bottom: 1rem;
@@ -138,15 +141,18 @@
 }
 
 .farmer-avatar {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
+  aspect-ratio: 1 / 1; /* Ensures perfect square for consistent circle */
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #2c5530;
+  display: block; /* Helps eliminate any default inline spacing issues */
 }
 
+
 .farmer-name {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #2c5530;
 }
@@ -234,8 +240,12 @@
   }
   
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
+  }
+  
+  .product-card {
+    min-width: 220px;
   }
   
   .products-header {
@@ -252,15 +262,11 @@
   }
 
   .product-image-container {
-    height: 180px;
+    height: 160px;
   }
 
   .farmer-info {
     padding: 0.75rem 0;
   }
 
-  .farmer-avatar {
-    width: 35px;
-    height: 35px;
-  }
 }

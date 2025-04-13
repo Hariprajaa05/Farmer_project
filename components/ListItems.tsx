@@ -13,7 +13,7 @@ interface FarmerDetails {
   name: string;
   location: string;
   district: string;
-  img: string;
+  img?: string; // Made optional
   products: string[];
 }
 
@@ -22,84 +22,96 @@ interface FarmerProduct {
   farmer_id: string;
   product_id: string;
   price: number;
-  image: string;
+  image?: string; // Made optional
   product_details: ProductDetails;
   farmer_details: FarmerDetails;
 }
 
-function ListItems() {
+const ListItems = () => {
   const [items, setItems] = useState<FarmerProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/farmer_products")
-      .then((res) => setItems(res.data))
-      .catch((err) => console.log(err));
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          "http://localhost:5000/farmer_products"
+        );
+        setItems(response.data);
+      } catch (err) {
+        setError("Failed to fetch products. Please try again later.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const handleQuantityChange = (id: string, qty: number) => {
+    // Round to 1 decimal place to avoid floating point precision issues
+    const roundedQty = Math.round(qty * 10) / 10;
     setQuantities((prev) => ({
       ...prev,
-      [id]: qty,
+      [id]: Math.max(0, roundedQty), // Ensure quantity doesn't go below 0
     }));
   };
 
+  const categories = ["All", "Vegetables", "Fruit", "Dairy"];
+
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
-      case "vegetables":
-        return "var(--vegetable-color)";
+      case "vegetable":
+        return "#90EE90"; // Green
+      case "fruit":
+        return "#FF9800"; // Orange
       case "dairy":
-        return "var(--dairy-color)";
-      case "fruits":
-        return "var(--fruit-color)";
+        return "#2196F3"; // Blue
       default:
-        return "var(--default-color)";
+        return "#9E9E9E"; // Grey
     }
   };
 
-  const handleBuyNow = (item: FarmerProduct, quantity: number) => {
-    // TODO: Implement buy functionality
-    console.log(
-      `Buying ${quantity}kg of ${item.product_details.name} from ${item.farmer_details.name}`
-    );
-  };
-
   const filteredItems =
-    selectedCategory === "all"
+    selectedCategory === "All"
       ? items
       : items.filter(
           (item) =>
-            item.product_details.category.toLowerCase() ===
+            item.product_details?.category?.toLowerCase() ===
             selectedCategory.toLowerCase()
         );
 
-  const categories = [
-    "all",
-    ...new Set(items.map((item) => item.product_details.category)),
-  ];
+  if (loading) return <div className="loading">Loading products...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (items.length === 0)
+    return <div className="empty">No products available</div>;
 
   return (
     <div className="products-container">
       <h2 className="products-header">Available Products</h2>
 
       <div className="category-filter">
-        {categories.map((category) => (
+        {categories.map((cat) => (
           <button
-            key={category}
+            key={cat}
             className={`category-btn ${
-              selectedCategory === category ? "active" : ""
+              selectedCategory === cat ? "active" : ""
             }`}
-            onClick={() => setSelectedCategory(category)}
             style={{
               backgroundColor:
-                category === "all"
-                  ? "var(--default-color)"
-                  : getCategoryColor(category),
+                selectedCategory === cat
+                  ? getCategoryColor(cat)
+                  : "transparent",
+              borderColor: getCategoryColor(cat),
             }}
+            onClick={() => setSelectedCategory(cat)}
           >
-            {category.charAt(0).toUpperCase() + category.slice(1)}
+            {cat}
           </button>
         ))}
       </div>
@@ -107,45 +119,66 @@ function ListItems() {
       <div className="products-grid">
         {filteredItems.map((item) => {
           const qty = quantities[item._id] || 0;
-          const categoryColor = getCategoryColor(item.product_details.category);
+          const badgeColor = getCategoryColor(
+            item.product_details?.category || ""
+          );
           return (
             <div key={item._id} className="product-card">
               <div className="product-image-container">
                 <img
-                  src={item.image}
-                  alt={`Image of ${item.product_details.name}`}
+                  src={item.image || "/placeholder-product.png"}
+                  alt={`Image of ${item.product_details?.name}`}
                   className="product-image"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      "/placeholder-product.png";
+                  }}
                 />
                 <div
                   className="product-badge"
-                  style={{ backgroundColor: categoryColor }}
+                  style={{ backgroundColor: badgeColor }}
                 >
-                  {item.product_details.category}
+                  {item.product_details?.category || "Unknown"}
                 </div>
               </div>
               <div className="product-content">
-                <h3 className="product-name">{item.product_details.name}</h3>
-                <p className="product-price">₹{item.price} / kg</p>
+                <h3 className="product-name">
+                  {item.product_details?.name || "Unknown Product"}
+                </h3>
+                <p className="product-price">₹{item.price.toFixed(2)} / kg</p>
+
                 <div className="farmer-info">
                   <div className="farmer-profile">
                     <img
-                      src={item.farmer_details?.img}
+                      src={
+                        item.farmer_details?.img || "/placeholder-avatar.png"
+                      }
                       alt={item.farmer_details?.name}
-                      className="farmer-avatar"
+                      className="w-2 h-2 rounded-full object-cover border-2 border-[#2c5530]"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "/placeholder-avatar.png";
+                      }}
                     />
-                    <span className="farmer-name">
-                      {item.farmer_details?.name}
-                    </span>
+
+                    <div>
+                      <p className="farmer-name">
+                        {item.farmer_details?.name || "Unknown Farmer"}
+                      </p>
+                      <p className="farmer-location">
+                        {item.farmer_details?.location ||
+                          "Location not specified"}
+                      </p>
+                    </div>
                   </div>
                 </div>
+
                 <div className="quantity-control">
                   <div className="quantity-buttons">
                     <button
                       className="quantity-btn"
-                      onClick={() =>
-                        handleQuantityChange(item._id, Math.max(0, qty - 0.5))
-                      }
-                      disabled={qty === 0}
+                      onClick={() => handleQuantityChange(item._id, qty - 0.5)}
+                      disabled={qty <= 0}
                     >
                       -
                     </button>
@@ -154,25 +187,18 @@ function ListItems() {
                     </span>
                     <button
                       className="quantity-btn"
-                      onClick={() =>
-                        handleQuantityChange(item._id, Math.min(4, qty + 0.5))
-                      }
-                      disabled={qty >= 4}
+                      onClick={() => handleQuantityChange(item._id, qty + 0.5)}
                     >
                       +
                     </button>
                   </div>
+
                   {qty > 0 && (
                     <>
                       <div className="total-price">
                         Total: ₹{(qty * item.price).toFixed(2)}
                       </div>
-                      <button
-                        className="buy-button"
-                        onClick={() => handleBuyNow(item, qty)}
-                      >
-                        Buy Now
-                      </button>
+                      <button className="buy-button">Buy Now</button>
                     </>
                   )}
                 </div>
@@ -183,6 +209,6 @@ function ListItems() {
       </div>
     </div>
   );
-}
+};
 
 export default ListItems;
