@@ -1,0 +1,24 @@
+.hover-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-img-wrapper {
+  background-color: #f8f9fa;
+}
+
+.card-title {
+  margin-bottom: 1rem;
+}
+
+.card-text {
+  margin-bottom: 0.5rem;
+}
+
+.text-primary {
+  color: #2c5530 !important;
+} 
