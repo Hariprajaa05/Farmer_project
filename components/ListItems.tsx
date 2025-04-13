@@ -1,36 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./ListItems.css";
 
-// 🛒 This defines the structure of each farmer and their products
+interface ProductDetails {
+  _id: string;
+  name: string;
+  category: string;
+}
+
+interface FarmerDetails {
+  _id: string;
+  name: string;
+  location: string;
+  district: string;
+  img: string;
+  products: string[];
+}
+
 interface FarmerProduct {
   _id: string;
-  farmer_id: {
-    name: string;
-    location: string;
-    district: string;
-    img: string;
-  };
-  product_id: {
-    name: string;
-  };
+  farmer_id: string;
+  product_id: string;
   price: number;
   image: string;
+  product_details: ProductDetails;
+  farmer_details: FarmerDetails;
 }
 
 function ListItems() {
-  // 🧺 State to hold list of farmer products
-  const [farmerProducts, setFarmerProducts] = useState<FarmerProduct[]>([]);
+  const [items, setItems] = useState<FarmerProduct[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  // 🌐 Fetch farmer products data from backend when component loads
   useEffect(() => {
-    fetch("http://localhost:5000/farmer_products")
-      .then((res) => res.json())
-      .then((data: FarmerProduct[]) => setFarmerProducts(data))
-      .catch((err) => console.error("Error fetching:", err));
+    axios
+      .get("http://localhost:5000/farmer_products")
+      .then((res) => setItems(res.data))
+      .catch((err) => console.log(err));
   }, []);
 
-  // 🔁 This function is called when user selects a quantity
   const handleQuantityChange = (id: string, qty: number) => {
     setQuantities((prev) => ({
       ...prev,
@@ -38,60 +46,141 @@ function ListItems() {
     }));
   };
 
+  const getCategoryColor = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "vegetables":
+        return "var(--vegetable-color)";
+      case "dairy":
+        return "var(--dairy-color)";
+      case "fruits":
+        return "var(--fruit-color)";
+      default:
+        return "var(--default-color)";
+    }
+  };
+
+  const handleBuyNow = (item: FarmerProduct, quantity: number) => {
+    // TODO: Implement buy functionality
+    console.log(
+      `Buying ${quantity}kg of ${item.product_details.name} from ${item.farmer_details.name}`
+    );
+  };
+
+  const filteredItems =
+    selectedCategory === "all"
+      ? items
+      : items.filter(
+          (item) =>
+            item.product_details.category.toLowerCase() ===
+            selectedCategory.toLowerCase()
+        );
+
+  const categories = [
+    "all",
+    ...new Set(items.map((item) => item.product_details.category)),
+  ];
+
   return (
     <div className="products-container">
-      <h1 className="products-header">Farmer Products</h1>
+      <h2 className="products-header">Available Products</h2>
 
-      {farmerProducts.length === 0 ? (
-        <p className="loading">Loading...</p>
-      ) : (
-        <div className="products-grid">
-          {farmerProducts.map((item) => {
-            const qty = quantities[item._id] || 1;
-            return (
-              <div key={item._id} className="product-card">
-                <div className="farmer-info">
-                  <img
-                    src={item.farmer_id.img}
-                    alt={`${item.farmer_id.name}'s profile`}
-                    className="farmer-image"
-                  />
-                  <div className="farmer-details">
-                    <h3 className="farmer-name">{item.farmer_id.name}</h3>
-                    <p className="farmer-location">
-                      {item.farmer_id.location}, {item.farmer_id.district}
-                    </p>
-                  </div>
-                </div>
-                <img src={item.image} alt="product" className="product-image" />
-                <div className="product-details">
-                  <h2 className="product-name">
-                    {item.product_id?.name ?? "Unnamed Product"}
-                  </h2>
-                  <p className="product-price">Price per kg: ₹{item.price}</p>
-                  <div className="quantity-selector">
-                    <label>
-                      Quantity:
-                      <select
-                        value={qty}
-                        onChange={(e) =>
-                          handleQuantityChange(item._id, Number(e.target.value))
-                        }
-                      >
-                        {[0.5, 1, 2, 3].map((kg) => (
-                          <option key={kg} value={kg}>
-                            {kg} kg - ₹{kg * item.price}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
+      <div className="category-filter">
+        {categories.map((category) => (
+          <button
+            key={category}
+            className={`category-btn ${
+              selectedCategory === category ? "active" : ""
+            }`}
+            onClick={() => setSelectedCategory(category)}
+            style={{
+              backgroundColor:
+                category === "all"
+                  ? "var(--default-color)"
+                  : getCategoryColor(category),
+            }}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      <div className="products-grid">
+        {filteredItems.map((item) => {
+          const qty = quantities[item._id] || 0;
+          const categoryColor = getCategoryColor(item.product_details.category);
+          return (
+            <div key={item._id} className="product-card">
+              <div className="product-image-container">
+                <img
+                  src={item.image}
+                  alt={`Image of ${item.product_details.name}`}
+                  className="product-image"
+                />
+                <div
+                  className="product-badge"
+                  style={{ backgroundColor: categoryColor }}
+                >
+                  {item.product_details.category}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+              <div className="product-content">
+                <h3 className="product-name">{item.product_details.name}</h3>
+                <p className="product-price">₹{item.price} / kg</p>
+                <div className="farmer-info">
+                  <div className="farmer-profile">
+                    <img
+                      src={item.farmer_details?.img}
+                      alt={item.farmer_details?.name}
+                      className="farmer-avatar"
+                    />
+                    <span className="farmer-name">
+                      {item.farmer_details?.name}
+                    </span>
+                  </div>
+                </div>
+                <div className="quantity-control">
+                  <div className="quantity-buttons">
+                    <button
+                      className="quantity-btn"
+                      onClick={() =>
+                        handleQuantityChange(item._id, Math.max(0, qty - 0.5))
+                      }
+                      disabled={qty === 0}
+                    >
+                      -
+                    </button>
+                    <span className="quantity-display">
+                      {qty > 0 ? `${qty} kg` : "Add"}
+                    </span>
+                    <button
+                      className="quantity-btn"
+                      onClick={() =>
+                        handleQuantityChange(item._id, Math.min(4, qty + 0.5))
+                      }
+                      disabled={qty >= 4}
+                    >
+                      +
+                    </button>
+                  </div>
+                  {qty > 0 && (
+                    <>
+                      <div className="total-price">
+                        Total: ₹{(qty * item.price).toFixed(2)}
+                      </div>
+                      <button
+                        className="buy-button"
+                        onClick={() => handleBuyNow(item, qty)}
+                      >
+                        Buy Now
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
