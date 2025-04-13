@@ -19,6 +19,43 @@ const farmerProductSchema=new mongoose.Schema({
     image: String,
 });
 
+
+
+//4th step connecting both schema structure and the farmer_product collection and making that as a model
+const FarmerProduct=mongoose.model("farmer_products",farmerProductSchema);
+
+//5th step getting all details from farmer_products
+app.get("/farmer_products", async (req, res) => {
+  try {
+    const products = await FarmerProduct.aggregate([
+      {
+        $lookup: {
+          from: "products",
+          localField: "product_id",
+          foreignField: "_id",
+          as: "product_details",
+        },
+      },
+      { $unwind: "$product_details" },
+
+      {
+        $lookup: {
+          from: "farmers",
+          localField: "farmer_id",
+          foreignField: "_id",
+          as: "farmer_details",
+        },
+      },
+      { $unwind: "$farmer_details" },
+    ]);
+
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching joined products and farmers");
+  }
+});
+
 //another example 
 const farmerlists=new mongoose.Schema({
   _id:mongoose.Types.ObjectId,
@@ -41,33 +78,6 @@ app.get("/farmers", async (req, res) => {
   }
 });
 //end of another example
-
-//4th step connecting both schema structure and the farmer_product collection and making that as a model
-const FarmerProduct=mongoose.model("farmer_products",farmerProductSchema);
-
-//5th step getting all details from farmer_products
-  app.get("/farmer_products", async (req, res) => {
-    try {
-      const products = await FarmerProduct.aggregate([ // aggregate used to work with joining in mongodb processes in stages
-      {
-        $lookup: {
-          from: "products",             // The name of the other collection
-          localField: "product_id",     // Field in farmerproducts
-          foreignField: "_id",          // Field in products collection
-          as: "product_details"         // Output field to store matched product
-        }
-      },
-    
-        {
-          $unwind: "$product_details" // flattens the product_details array
-        }
-      ]);
-  
-      res.json(products);
-    } catch (err) {
-      res.status(500).send("Error fetching joined products");
-    }
-  });
 
   
 //6 run it
