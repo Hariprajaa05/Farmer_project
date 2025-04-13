@@ -59,15 +59,22 @@ function FarmerProfile() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [farmerRes, productsRes] = await Promise.all([
-          axios.get<Farmer>(`http://localhost:5000/farmers/${id}`),
-          axios.get<FarmerProduct[]>(
-            `http://localhost:5000/farmer_products?farmer_id=${id}`
-          ),
-        ]);
-
+        // First fetch the farmer details
+        const farmerRes = await axios.get<Farmer>(
+          `http://localhost:5000/farmers/${id}`
+        );
         setFarmer(farmerRes.data);
-        setFarmerProducts(productsRes.data);
+
+        // Then fetch only the products for this specific farmer
+        const productsRes = await axios.get<FarmerProduct[]>(
+          `http://localhost:5000/farmer_products?farmer_id=${id}`
+        );
+
+        // Filter products to ensure they belong to this farmer
+        const farmerProducts = productsRes.data.filter(
+          (product) => product.farmer_id === id
+        );
+        setFarmerProducts(farmerProducts);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(
@@ -81,13 +88,17 @@ function FarmerProfile() {
     fetchData();
   }, [id]);
 
+  // Get unique categories from the farmer's products
   const categories = [
     "All",
     ...new Set(
-      farmerProducts.map((p) => p.product_details?.category).filter(Boolean)
+      farmerProducts
+        .map((p) => p.product_details?.category)
+        .filter((category): category is string => Boolean(category))
     ),
   ];
 
+  // Filter products by selected category
   const filteredProducts =
     selectedCategory === "All"
       ? farmerProducts
