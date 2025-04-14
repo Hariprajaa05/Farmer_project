@@ -48,6 +48,20 @@ function FarmerProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const getCategoryColor = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "vegetable":
+        return "#90EE90"; // Light Green
+      case "fruit":
+        return "#FF9800"; // Orange
+      case "dairy":
+        return "#2196F3"; // Blue
+      default:
+        return "#9E9E9E"; // Grey
+    }
+  };
 
   useEffect(() => {
     if (!id) {
@@ -88,6 +102,10 @@ function FarmerProfile() {
     fetchData();
   }, [id]);
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
   // Get unique categories from the farmer's products
   const categories = [
     "All",
@@ -98,13 +116,21 @@ function FarmerProfile() {
     ),
   ];
 
-  // Filter products by selected category
-  const filteredProducts =
-    selectedCategory === "All"
-      ? farmerProducts
-      : farmerProducts.filter(
-          (p) => p.product_details?.category === selectedCategory
-        );
+  // Filter products by selected category and search query
+  const filteredProducts = farmerProducts.filter((item) => {
+    const matchesCategory =
+      selectedCategory === "All" ||
+      item.product_details?.category?.toLowerCase() ===
+        selectedCategory.toLowerCase();
+
+    const matchesSearch =
+      searchQuery === "" ||
+      item.product_details?.name
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
 
   if (loading) return <div className="loading">Loading Farmer Profile...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -162,7 +188,18 @@ function FarmerProfile() {
       </div>
 
       <div className="products-section">
-        <h3>Products</h3>
+        <div className="products-header">
+          <h3 className="products-title">Products</h3>
+          <div className="products-search-container">
+            <input
+              type="text"
+              className="products-search-bar"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+          </div>
+        </div>
         <div className="category-filter">
           {categories.map((category) => (
             <button
@@ -170,6 +207,13 @@ function FarmerProfile() {
               className={`category-btn ${
                 selectedCategory === category ? "active" : ""
               }`}
+              style={{
+                backgroundColor:
+                  selectedCategory === category
+                    ? getCategoryColor(category)
+                    : "transparent",
+                borderColor: getCategoryColor(category),
+              }}
               onClick={() => category && setSelectedCategory(category)}
             >
               {category}
