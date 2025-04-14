@@ -113,14 +113,16 @@ function FarmerProfile() {
   return (
     <div className="farmer-profile-container">
       <div className="farmer-header">
-        <img
-          src={farmer.img || "/placeholder-avatar.png"}
-          alt={farmer.name}
-          className="profile-img"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "/placeholder-avatar.png";
-          }}
-        />
+        <div className="profile-img-container">
+          <img
+            src={farmer.img || "/placeholder-avatar.png"}
+            alt={farmer.name}
+            className="profile-img"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/placeholder-avatar.png";
+            }}
+          />
+        </div>
         <div className="farmer-info">
           <h2>{farmer.name}</h2>
           <p>📍 {farmer.location}</p>

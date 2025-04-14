@@ -127,34 +127,72 @@
 .farmer-info {
   display: flex;
   align-items: center;
-  padding: 0.75rem 0;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
-  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.farmer-info:hover {
+  background-color: rgba(44, 85, 48, 0.05);
+  border-radius: 6px;
 }
 
 .farmer-profile {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   width: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.farmer-avatar-container {
+  flex-shrink: 0;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid #2c5530;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.farmer-avatar-container:hover {
+  transform: scale(1.1);
 }
 
 .farmer-avatar {
-  width: 30px;
-  height: 30px;
-  aspect-ratio: 1 / 1; /* Ensures perfect square for consistent circle */
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 2px solid #2c5530;
-  display: block; /* Helps eliminate any default inline spacing issues */
 }
 
+.farmer-details {
+  flex: 1;
+  min-width: 0;
+}
 
 .farmer-name {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #2c5530;
+  margin-bottom: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.farmer-location {
+  font-size: 0.8rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .quantity-control {

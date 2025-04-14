@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./ListItems.css";
 
 interface ProductDetails {
@@ -28,6 +29,7 @@ interface FarmerProduct {
 }
 
 const ListItems = () => {
+  const navigate = useNavigate();
   const [items, setItems] = useState<FarmerProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,10 +58,14 @@ const ListItems = () => {
   const handleQuantityChange = (id: string, qty: number) => {
     // Round to 1 decimal place to avoid floating point precision issues
     const roundedQty = Math.round(qty * 10) / 10;
-    setQuantities((prev) => ({
-      ...prev,
-      [id]: Math.max(0, roundedQty), // Ensure quantity doesn't go below 0
-    }));
+
+    // Ensure quantity stays between 0 and 3
+    if (roundedQty >= 0 && roundedQty <= 3) {
+      setQuantities((prev) => ({
+        ...prev,
+        [id]: roundedQty,
+      }));
+    }
   };
 
   const categories = ["All", "Vegetables", "Fruit", "Dairy"];
@@ -85,6 +91,10 @@ const ListItems = () => {
             item.product_details?.category?.toLowerCase() ===
             selectedCategory.toLowerCase()
         );
+
+  const handleFarmerClick = (farmerId: string) => {
+    navigate(`/farmer/${farmerId}`);
+  };
 
   if (loading) return <div className="loading">Loading products...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -147,25 +157,30 @@ const ListItems = () => {
                 </h3>
                 <p className="product-price">₹{item.price.toFixed(2)} / kg</p>
 
-                <div className="farmer-info">
+                <div
+                  className="farmer-info"
+                  onClick={() => handleFarmerClick(item.farmer_details._id)}
+                >
                   <div className="farmer-profile">
-                    <img
-                      src={
-                        item.farmer_details?.img || "/placeholder-avatar.png"
-                      }
-                      alt={item.farmer_details?.name}
-                      className="w-2 h-2 rounded-full object-cover border-2 border-[#2c5530]"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "/placeholder-avatar.png";
-                      }}
-                    />
-
-                    <div>
+                    <div className="farmer-avatar-container">
+                      <img
+                        src={
+                          item.farmer_details?.img || "/placeholder-avatar.png"
+                        }
+                        alt={item.farmer_details?.name}
+                        className="farmer-avatar"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "/placeholder-avatar.png";
+                        }}
+                      />
+                    </div>
+                    <div className="farmer-details">
                       <p className="farmer-name">
                         {item.farmer_details?.name || "Unknown Farmer"}
                       </p>
                       <p className="farmer-location">
+                        📍{" "}
                         {item.farmer_details?.location ||
                           "Location not specified"}
                       </p>
@@ -198,7 +213,7 @@ const ListItems = () => {
                       <div className="total-price">
                         Total: ₹{(qty * item.price).toFixed(2)}
                       </div>
-                      <button className="buy-button">Buy Now</button>
+                      <button className="buy-button">Add to Cart</button>
                     </>
                   )}
                 </div>
