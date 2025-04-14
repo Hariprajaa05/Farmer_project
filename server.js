@@ -3,6 +3,7 @@ import express from "express"; //nodejs + express easier to write code than writ
 import mongoose from "mongoose"; // for communicating with mongodb 
 import cors from "cors" // enabling cross orgin resource sharing ie communicating between server(node) and react from different ports 
 
+
 const app=express();
 app.use(cors());
 app.use(express.json());
@@ -78,6 +79,19 @@ app.get("/farmers", async (req, res) => {
   }
 });
 //end of another example
+// Example: server.js or farmers.js
+app.get("/farmers/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const farmer = await FarmerList.findById(id);
+    if (!farmer) return res.status(404).json({ message: "Farmer not found" });
+    res.json(farmer);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
   
 //6 run it
