@@ -1,12 +1,12 @@
 :root {
-  --primary-color: #2c5530;
-  --secondary-color: #4CAF50;
-  --accent-color: #FF9800;
+  --primary-color: #6482AD; /* soft blue-green leaf tone */
+  --secondary-color: #7FA1C3; /* lighter greenish blue */
+  --accent-color: #E2DAD6; /* light beige for soft touches */
   --text-color: #333;
   --light-text: #666;
-  --border-color: #eee;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  --border-color: #ddd;
+  --card-shadow: 0 4px 8px rgba(100, 130, 173, 0.15);
+  --hover-shadow: 0 8px 16px rgba(100, 130, 173, 0.2);
   --transition-speed: 0.3s;
 }
 
@@ -14,7 +14,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: #f8f9fa;
+  background-color: #F5EDED;
 }
 
 .farmer-list-header {
@@ -129,11 +129,7 @@
   color: var(--primary-color);
 }
 
-.farmer-location {
-  font-weight: 600;
-  color: var(--text-color);
-}
-
+.farmer-location,
 .farmer-district {
   font-weight: 600;
   color: var(--text-color);
@@ -159,7 +155,7 @@
 }
 
 .farmer-crop-tag {
-  background-color: rgba(44, 85, 48, 0.1);
+  background-color: rgba(100, 130, 173, 0.1);
   color: var(--primary-color);
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
@@ -210,12 +206,12 @@
   .farmer-list-container {
     padding: 1.5rem;
   }
-  
+
   .farmer-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
   }
-  
+
   .farmer-list-header {
     font-size: 2rem;
     margin-bottom: 2rem;
@@ -232,4 +228,4 @@
   .farmer-name {
     font-size: 1.3rem;
   }
-} 
+}
