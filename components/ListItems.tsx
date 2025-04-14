@@ -35,7 +35,6 @@ const ListItems = () => {
   const [error, setError] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -84,27 +83,14 @@ const ListItems = () => {
     }
   };
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const filteredItems = items.filter((item) => {
-    const matchesCategory =
-      selectedCategory === "All" ||
-      item.product_details?.category?.toLowerCase() ===
-        selectedCategory.toLowerCase();
-
-    const matchesSearch =
-      searchQuery === "" ||
-      item.product_details?.name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      item.farmer_details?.name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
-
-    return matchesCategory && matchesSearch;
-  });
+  const filteredItems =
+    selectedCategory === "All"
+      ? items
+      : items.filter(
+          (item) =>
+            item.product_details?.category?.toLowerCase() ===
+            selectedCategory.toLowerCase()
+        );
 
   const handleFarmerClick = (farmerId: string) => {
     navigate(`/farmer/${farmerId}`);
@@ -124,15 +110,6 @@ const ListItems = () => {
       >
         View All Farmers
       </button>
-      <div className="search-container">
-        <input
-          type="text"
-          className="search-bar"
-          placeholder="Search products or farmers..."
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-      </div>
       <div className="category-filter">
         {categories.map((cat) => (
           <button

@@ -38,6 +38,16 @@ interface Collection {
   products?: string[];
 }
 
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  description: string;
+  quantity: number;
+}
+
 function FarmerProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -49,6 +59,8 @@ function FarmerProfile() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
@@ -102,6 +114,30 @@ function FarmerProfile() {
     fetchData();
   }, [id]);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get<Product[]>(
+          `/api/farmers/${id}/products`
+        );
+        setProducts(response.data);
+        // Initialize quantities for all products
+        const initialQuantities = response.data.reduce(
+          (acc: { [key: string]: number }, product: Product) => {
+            acc[product.id.toString()] = 0;
+            return acc;
+          },
+          {}
+        );
+        setQuantities(initialQuantities);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [id]);
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
@@ -131,6 +167,35 @@ function FarmerProfile() {
 
     return matchesCategory && matchesSearch;
   });
+
+  const handleQuantityChange = (productId: string, change: number) => {
+    setQuantities((prev) => {
+      const currentQuantity = prev[productId] || 0;
+      const newQuantity = Math.max(
+        0,
+        Math.min(3, currentQuantity + change * 0.5)
+      );
+      // Round to 1 decimal place to avoid floating point issues
+      return { ...prev, [productId]: Number(newQuantity.toFixed(1)) };
+    });
+  };
+
+  const handleAddToCart = async (productId: string) => {
+    if (quantities[productId] <= 0) return;
+
+    try {
+      await axios.post("/api/cart/add", {
+        productId,
+        quantity: quantities[productId],
+      });
+      // Reset quantity after adding to cart
+      setQuantities((prev) => ({ ...prev, [productId]: 0 }));
+      // You might want to show a success message here
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      // You might want to show an error message here
+    }
+  };
 
   if (loading) return <div className="loading">Loading Farmer Profile...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -189,7 +254,7 @@ function FarmerProfile() {
 
       <div className="products-section">
         <div className="products-header">
-          <h3 className="products-title">Products</h3>
+          <h3 className="products-title">Products On The Market</h3>
           <div className="products-search-container">
             <input
               type="text"
@@ -244,6 +309,40 @@ function FarmerProfile() {
                     {prod.product_details.description}
                   </p>
                 )}
+                <div className="quantity-control">
+                  <div className="quantity-buttons">
+                    <button
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(prod._id, -1)}
+                      disabled={quantities[prod._id] <= 0}
+                    >
+                      -
+                    </button>
+                    <span className="quantity-display">
+                      {quantities[prod._id]} kg
+                    </span>
+                    <button
+                      className="quantity-btn"
+                      onClick={() => handleQuantityChange(prod._id, 1)}
+                      disabled={quantities[prod._id] >= 3}
+                    >
+                      +
+                    </button>
+                  </div>
+                  {quantities[prod._id] > 0 && (
+                    <>
+                      <div className="total-price">
+                        Total: ₹{(prod.price * quantities[prod._id]).toFixed(2)}
+                      </div>
+                      <button
+                        className="buy-button"
+                        onClick={() => handleAddToCart(prod._id)}
+                      >
+                        Add to Cart
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             ))}
           </div>
