@@ -72,14 +72,14 @@ const ListItems = () => {
 
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
-      case "vegetable":
-        return "#90EE90"; // Green
+      case "vegetables":
+        return "#C8E6C9"; // Light Green
       case "fruit":
-        return "#FF9800"; // Orange
+        return "#FFE0B2"; // Light Orange
       case "dairy":
-        return "#2196F3"; // Blue
+        return "#BBDEFB"; // Light Blue
       default:
-        return "#9E9E9E"; // Grey
+        return "#E0E0E0"; // Light Grey
     }
   };
 
