@@ -66,24 +66,21 @@
 }
 
 /* Auth buttons */
+/* Auth links - same as nav-link */
 .auth-link {
-  color: #fff;
-  background-color: #6482AD; /* blue tone */
-  padding: 6px 12px;
-  border-radius: 6px;
+  color: #333;
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.95rem;
-  transition: background-color 0.3s ease;
-}
-
-.auth-link.signup {
-  background-color: #7FA1C3; /* lighter blue */
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .auth-link:hover {
-  background-color: #506a94;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #4caf50;
 }
+
 
 @media (max-width: 768px) {
   .header-content {
