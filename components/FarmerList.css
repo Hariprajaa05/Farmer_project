@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #6482AD; /* soft blue-green leaf tone */
+  --primary-color: #2c5530; /* soft blue-green leaf tone */
   --secondary-color: #7FA1C3; /* lighter greenish blue */
   --accent-color: #E2DAD6; /* light beige for soft touches */
   --text-color: #333;
@@ -14,7 +14,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: #F5EDED;
+  background-color: #f8f9fa;
 }
 
 .farmer-list-header {

@@ -1,0 +1,123 @@
+.app-header {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-container {
+  flex: 0 0 auto;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c5530;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.logo:hover {
+  color: #388e3c;
+}
+
+.main-nav {
+  display: flex;
+  gap: 20px;
+  margin: 0 20px;
+}
+
+.nav-link {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #4caf50;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-signup-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Auth buttons */
+.auth-link {
+  color: #fff;
+  background-color: #6482AD; /* blue tone */
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease;
+}
+
+.auth-link.signup {
+  background-color: #7FA1C3; /* lighter blue */
+}
+
+.auth-link:hover {
+  background-color: #506a94;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 15px;
+    height: 60px;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .main-nav {
+    gap: 10px;
+    margin: 0 10px;
+  }
+
+  .nav-link {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .login-signup-links {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  
+
+}

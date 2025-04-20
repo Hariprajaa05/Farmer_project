@@ -36,7 +36,6 @@ function FarmerList() {
   //we map the usestate and then we display it
   return (
     <div className="farmer-list-container">
-      <h2 className="farmer-list-header">Farmer Profiles</h2>
       <div className="farmer-grid">
         {farmers.map((farmer /**any name */) => (
           <div key={farmer._id} className="farmer-card">

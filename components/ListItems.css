@@ -12,18 +12,14 @@
   background-color: #f8f9fa;
 }
 
-.products-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #2c5530;
-  font-size: 2.5rem;
-  font-weight: 600;
-}
+
 .header-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 20px 0;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .view-farmers-button {
@@ -294,11 +290,9 @@
 }
 
 .search-container {
-  margin-bottom: 1.5rem;
-  width: 100%;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  flex: 1;
+  max-width: 400px;
+  position: relative;
 }
 
 .search-bar {
@@ -346,9 +340,6 @@
     min-width: 220px;
   }
   
-  .products-header {
-    font-size: 2rem;
-  }
 
   .category-filter {
     gap: 0.5rem;
@@ -367,4 +358,12 @@
     padding: 0.75rem 0;
   }
 
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-container {
+    max-width: 100%;
+  }
 }

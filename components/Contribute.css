@@ -1,0 +1,102 @@
+/* Basic Styles for the Contribute Page */
+.contribute-page {
+  background-color: #f4f4f4;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+/* Heading styles */
+.contribute-page h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #921a40;  /* Consistent with your brand color */
+  margin-bottom: 20px;
+}
+
+/* Container for the funding request cards */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Individual funding request card */
+.funding-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.funding-card:hover {
+  transform: scale(1.05);
+}
+
+/* Title of each funding request */
+.funding-card h3 {
+  font-size: 1.5rem;
+  color: #921a40;  /* Matching color with the heading */
+  margin-bottom: 10px;
+}
+
+/* Description of the funding request */
+.funding-card p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* Styles for needed and raised amounts */
+.funding-card p strong {
+  font-weight: bold;
+  color: #7fa1c3; /* Highlighted color for the amounts */
+}
+
+/* Status of the request */
+.funding-card p strong:last-child {
+  color: #2d9b1c; /* Green for 'open' status */
+}
+
+/* Input and button styles for donations */
+.funding-card input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.funding-card button {
+  background-color: #921a40; /* Green background */
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.funding-card button:hover {
+  background-color: #7fa1c3; /* Hover effect */
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .contribute-page {
+    padding: 10px;
+  }
+
+  .cards-container {
+    grid-template-columns: 1fr; /* Stack the cards vertically on smaller screens */
+  }
+
+  .funding-card {
+    padding: 15px;
+  }
+}

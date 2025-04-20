@@ -9,6 +9,7 @@ interface Farmer {
   location: string;
   district: string;
   img: string;
+  farm: string[];
   products: string[];
   description?: string;
   experience?: number;
@@ -48,6 +49,17 @@ interface Product {
   quantity: number;
 }
 
+interface FundingRequest {
+  id: number;
+  farmer_id: string;
+  title: string;
+  description: string;
+  amount_needed: number;
+  amount_raised: number;
+  status: "open" | "closed";
+  created_at: string;
+}
+
 function FarmerProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -61,6 +73,11 @@ function FarmerProfile() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [products, setProducts] = useState<Product[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [fundingRequests, setFundingRequests] = useState<FundingRequest[]>([]);
+  const [showFundingRequests, setShowFundingRequests] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [email, setEmail] = useState("");
 
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
@@ -101,12 +118,22 @@ function FarmerProfile() {
           (product) => product.farmer_id === id
         );
         setFarmerProducts(farmerProducts);
+
+        // Fetch funding requests for this farmer
+        try {
+          const fundingRes = await axios.get<FundingRequest[]>(
+            `http://localhost:5000/funding-requests/${id}`
+          );
+          setFundingRequests(fundingRes.data);
+        } catch (fundingErr) {
+          console.error("Error fetching funding requests:", fundingErr);
+          // Don't set error here, as it's not critical for the main profile
+        }
+
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to load farmer data"
-        );
-      } finally {
+        setError("Failed to load farmer data. Please try again later.");
         setLoading(false);
       }
     };
@@ -197,6 +224,31 @@ function FarmerProfile() {
     }
   };
 
+  const calculateProgress = (raised: number, needed: number) => {
+    return Math.min(Math.round((raised / needed) * 100), 100);
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      // Here you would typically make an API call to save the subscription
+      // For now, we'll just simulate a successful subscription
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsSubscribed(true);
+      setShowSubscribeModal(false);
+      setEmail("");
+    } catch (err) {
+      console.error("Error subscribing:", err);
+      setError("Failed to subscribe. Please try again later.");
+    }
+  };
+
   if (loading) return <div className="loading">Loading Farmer Profile...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!farmer) return <div className="error">Farmer not found!</div>;
@@ -237,20 +289,106 @@ function FarmerProfile() {
             </div>
           )}
         </div>
-        <button
-          className="contribute-btn"
-          onClick={() => navigate(`/contribute/${farmer._id}`)}
-        >
-          Contribute
-        </button>
-      </div>
-
-      <div className="farm-image-section">
-        <h3>Farm Overview</h3>
-        <div className="farm-image-wrapper">
-          <img src="/placeholder-farm.jpg" alt="Farm" className="farm-image" />
+        <div className="action-buttons">
+          {fundingRequests.length > 0 && (
+            <button
+              className="view-funding-btn"
+              onClick={() => setShowFundingRequests(!showFundingRequests)}
+            >
+              {showFundingRequests
+                ? "Hide Funding Requests"
+                : "View Funding Requests"}
+            </button>
+          )}
+          <button
+            className={`subscribe-btn ${isSubscribed ? "subscribed" : ""}`}
+            onClick={() => (isSubscribed ? null : setShowSubscribeModal(true))}
+          >
+            {isSubscribed ? "Subscribed ✓" : "Subscribe"}
+          </button>
         </div>
       </div>
+
+      {showFundingRequests && fundingRequests.length > 0 && (
+        <div className="funding-requests-section">
+          <h3>Funding Requests</h3>
+          <div className="funding-requests-container">
+            {fundingRequests.map((request) => (
+              <div key={request.id} className="funding-request-card">
+                <div className="request-header">
+                  <h4>{request.title}</h4>
+                  <span className={`status-badge ${request.status}`}>
+                    {request.status.charAt(0).toUpperCase() +
+                      request.status.slice(1)}
+                  </span>
+                </div>
+                <p className="description">{request.description}</p>
+                <div className="funding-details">
+                  <div className="amount-info">
+                    <div className="amount-needed">
+                      <span>Amount Needed:</span>
+                      <span className="amount">
+                        ₹{request.amount_needed.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="amount-raised">
+                      <span>Amount Raised:</span>
+                      <span className="amount">
+                        ₹{request.amount_raised.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="progress-container">
+                    <div
+                      className="progress-bar"
+                      style={{
+                        width: `${calculateProgress(
+                          request.amount_raised,
+                          request.amount_needed
+                        )}%`,
+                      }}
+                    ></div>
+                    <span className="progress-text">
+                      {calculateProgress(
+                        request.amount_raised,
+                        request.amount_needed
+                      )}
+                      %
+                    </span>
+                  </div>
+                </div>
+                {request.status === "open" && (
+                  <button
+                    className="donate-button"
+                    onClick={() => navigate(`/contribute/${farmer._id}`)}
+                  >
+                    Donate
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {farmer.farm && farmer.farm.length > 0 && (
+        <div className="farm-overview-section">
+          <h3>🌾 Farm Overview</h3>
+          <div className="farm-images-container">
+            {farmer.farm.map((farmImgUrl, index) => (
+              <img
+                key={index}
+                src={farmImgUrl}
+                alt={`Farm ${index + 1}`}
+                className="farm-image"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder-farm.png";
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="products-section">
         <div className="products-header">
@@ -372,8 +510,44 @@ function FarmerProfile() {
           </div>
         </div>
       )}
+
+      {/* Subscribe Modal */}
+      {showSubscribeModal && (
+        <div className="modal-overlay">
+          <div className="subscribe-modal">
+            <h3>Subscribe to Updates</h3>
+            <p>
+              Get notified about new products, funding requests, and updates
+              from {farmer.name}.
+            </p>
+            <form onSubmit={handleSubscribe}>
+              <div className="form-group">
+                <label htmlFor="email">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  onClick={() => setShowSubscribeModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="submit-btn">
+                  Subscribe
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
 export default FarmerProfile;
