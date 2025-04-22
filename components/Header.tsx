@@ -20,6 +20,9 @@ const Header: React.FC = () => {
           <Link to="/Farmers" className="nav-link">
             Farmers
           </Link>
+          <Link to="/seasonalcrops" className="nav-link">
+            Sesonal Crops
+          </Link>
         </nav>
 
         <div className="header-actions">
