@@ -75,6 +75,7 @@ app.get("/farmers", async (req, res) => {
 });
 
 // Example: server.js or farmers.js
+
 app.get("/farmers/:id", async (req, res) => {
   const { id } = req.params;
   try {
