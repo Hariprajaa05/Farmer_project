@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import { useAuth } from "../components/AuthContext";
 
 interface LoginResponse {
   _id?: string;
   role?: string;
-  message?: string; //optional (?) handles both success and error neatly.
+  message?: string;
 }
 
 const Login: React.FC = () => {
   const [name, setName] = useState("");
-  const [pass, setPass] = useState(""); // still a string in state
+  const [pass, setPass] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { login } = useAuth(); // ✅ hook used inside component
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,22 +44,22 @@ const Login: React.FC = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      if (data.role === "farmer") {
-        const farmerId = data._id;
-        if (!farmerId) {
-          throw new Error("Farmer ID is missing in server response");
-        }
+      // ✅ Update context
+      login({
+        id: data._id!,
+        role: data.role!,
+        name,
+      });
 
-        setTimeout(() => {
-          navigate(`/farmer/${farmerId}/edit`); // <-- redirecting to edit page
-        }, 500);
+      // ✅ Navigate based on role
+      if (data.role === "farmer") {
+        navigate(`/farmer/${data._id}/edit`);
       } else {
-        setError("Unauthorized role");
+        navigate("/products");
       }
-    } catch (err) {
-      const error = err as Error;
+    } catch (error) {
       console.error("Login error:", error);
-      setError(error.message);
+      setError("Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
