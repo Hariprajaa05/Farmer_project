@@ -43,15 +43,9 @@ function FarmerEditPage() {
   const [farmerProducts, setFarmerProducts] = useState<FarmerProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(true); // Keeping this as true based on the original component's state
   const [showCart, setShowCart] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    price: "",
-    image: "",
-    category: "",
-  });
 
   useEffect(() => {
     if (!id) {
@@ -138,44 +132,6 @@ function FarmerEditPage() {
         return product;
       })
     );
-  };
-
-  const handleNewProductChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setNewProduct((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleAddProduct = async () => {
-    try {
-      const response = await axios.post(
-        `http://localhost:5000/farmer_products`,
-        {
-          farmer_id: id,
-          price: Number(newProduct.price),
-          image: newProduct.image,
-          product_details: {
-            name: newProduct.name,
-            category: newProduct.category,
-          },
-        }
-      );
-
-      setFarmerProducts((prev) => [...prev, response.data]);
-      setNewProduct({
-        name: "",
-        price: "",
-        image: "",
-        category: "",
-      });
-    } catch (err) {
-      console.error("Error adding product:", err);
-      setError("Failed to add product. Please try again.");
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -412,7 +368,6 @@ function FarmerEditPage() {
                       className="product-input"
                       placeholder="Price"
                     />
-
                     <input
                       type="text"
                       name="category"
@@ -437,53 +392,6 @@ function FarmerEditPage() {
             </div>
           ))}
         </div>
-
-        {isEditing && (
-          <div className="add-product-section">
-            <h3>Add New Product</h3>
-            <div className="new-product-form">
-              <input
-                type="text"
-                name="name"
-                value={newProduct.name}
-                onChange={handleNewProductChange}
-                placeholder="Product name"
-                className="product-input"
-              />
-              <input
-                type="text"
-                name="price"
-                value={newProduct.price}
-                onChange={handleNewProductChange}
-                placeholder="Price"
-                className="product-input"
-              />
-              <input
-                type="text"
-                name="image"
-                value={newProduct.image}
-                onChange={handleNewProductChange}
-                placeholder="Image URL"
-                className="product-input"
-              />
-              <input
-                type="text"
-                name="category"
-                value={newProduct.category}
-                onChange={handleNewProductChange}
-                placeholder="Category"
-                className="product-input"
-              />
-              <button
-                type="button"
-                className="add-product-btn"
-                onClick={handleAddProduct}
-              >
-                Add Product
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
