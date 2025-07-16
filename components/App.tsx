@@ -20,6 +20,7 @@ function App() {
         <div className="app-container">
           <Routes>
             <Route path="/" element={<LandingPage />} />
+
             <Route
               path="/farmers"
               element={
@@ -29,6 +30,7 @@ function App() {
                 </>
               }
             />
+
             <Route
               path="/farmer/:id"
               element={
@@ -38,6 +40,18 @@ function App() {
                 </>
               }
             />
+
+            {/* 👇 Additional route to prevent blank screen after saving */}
+            <Route
+              path="/farmer/profile/:id"
+              element={
+                <>
+                  <Header />
+                  <FarmerProfile />
+                </>
+              }
+            />
+
             <Route
               path="/contribute/:farmerId"
               element={
